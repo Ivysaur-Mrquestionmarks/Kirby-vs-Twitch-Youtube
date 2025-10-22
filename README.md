@@ -10,3 +10,6 @@ A program that hooks into dolphin emulator and uses the youtube or twitch API to
 -Implement a queue system and controls for the API.
 -Implement an error handleing system.
 -Implement the rest of the effects.
+
+## Special thanks
+Fyiik.
