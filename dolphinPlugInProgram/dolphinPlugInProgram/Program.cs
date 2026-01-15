@@ -57,7 +57,7 @@ namespace dolphinPlugInProgram //uwu
                     Console.WriteLine($"*(0x80000024) = 0x{BitConverter.ToUInt32(buffer1, 0):X}");
 
                     int bytesWritten = 0;
-                    byte[] buffer = { 0x0, 0x0, 0x0, 0xAA};
+                    byte[] buffer = { 0x10, 0x0, 0x0, 0xAC};
 
                     WriteProcessMemory(processHandle, mem1Address, buffer, buffer.Length, ref bytesWritten);
                 Console.WriteLine(bytesWritten);
