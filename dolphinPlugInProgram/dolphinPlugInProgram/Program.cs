@@ -1,14 +1,22 @@
-﻿using Dolphin.Memory.Access;
+﻿using CurlDotNet;
+using CurlDotNet.Core;
+using Dolphin.Memory.Access;
 using System.Diagnostics;
+using System.IO;
+using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Runtime.InteropServices;
 using System.Text;
-
+using System.Text.Json;
 
 
 namespace dolphinPlugInProgram //uwu
 {
     internal class Program
     {
+
+
+        
 
 
         [DllImport("kernel32.dll")]
@@ -32,10 +40,14 @@ namespace dolphinPlugInProgram //uwu
             [STAThread]
             static void Main(string[] args)
             {
-                Process process = Process.GetProcessesByName("dolphin")[0];
-                IntPtr hProcess = OpenProcess(PROCESS_WM_READ, false, process.Id);
-            IntPtr processHandle = OpenProcess(0x1F0FFF, false, process.Id);
-            Dolphin.Memory.Access.Dolphin dol = new Dolphin.Memory.Access.Dolphin(process);
+                Program meh = new Program();
+                meh.createToken();
+
+
+               Process process = Process.GetProcessesByName("dolphin")[0];
+               IntPtr hProcess = OpenProcess(PROCESS_WM_READ, false, process.Id);
+               IntPtr processHandle = OpenProcess(0x1F0FFF, false, process.Id);
+                Dolphin.Memory.Access.Dolphin dol = new Dolphin.Memory.Access.Dolphin(process);
             /*
                 dol.TryGetBaseMEM1Address(out IntPtr mem1);
                 Console.WriteLine($"Mem1 address = 0x{mem1:X}");
@@ -49,7 +61,7 @@ namespace dolphinPlugInProgram //uwu
                    dol.TryGetBaseAddress(out IntPtr mem2);
                     Console.WriteLine($"Mem2 address = 0x{mem2:X}");
 
-            dol.TryGetAddress(0x80000024, out IntPtr mem1Address);
+                dol.TryGetAddress(0x80000024, out IntPtr mem1Address);
                 byte[] buffer1 = new byte[4];
                 if (ReadProcessMemory(hProcess, mem1Address, buffer1, buffer1.Length, out IntPtr bytesRead))
                 {
@@ -64,13 +76,37 @@ namespace dolphinPlugInProgram //uwu
                     byte[] buffer2 = { 0x00, 0x00, 0x00, 0x01 };
 
                     WriteProcessMemory(processHandle, mem1Address, buffer2, buffer2.Length, ref bytesWritten);
-                Console.WriteLine(bytesWritten);
-            }
-              
+                    Console.WriteLine(bytesWritten);
+                }
 
+            System.Threading.Thread.Sleep(50000);
+        }
+        async void createToken() {
+
+            var result = await Curl.ExecuteAsync(@"
+                curl -X POST https://id.twitch.tv/oauth2/token \
+                -H 'Content-Type: application/x-www-form-urlencoded' \
+                -d 'client_id=1qr5we58yuoxy63j14didy20d4adb9&client_secret=me6n8cx9dg6gu0iitg1b6bqw5yrgyw&grant_type=client_credentials'
+            ");
+
+            if (result.IsSuccess)
+            {
+                Console.WriteLine("Haiii");
+                Console.WriteLine(result.Body);
+                string[] parts = result.Body.Split('"');
+                Console.WriteLine(parts[3]);
+                //var charge = result.ParseJson<StripeCharge>();
+                //Console.WriteLine($"Payment successful! ID: {charge.Id}");
+            }
+            else {
+                Console.WriteLine(":(");
             }
         }
+
     }
 
-    
+}
+
+
+
 

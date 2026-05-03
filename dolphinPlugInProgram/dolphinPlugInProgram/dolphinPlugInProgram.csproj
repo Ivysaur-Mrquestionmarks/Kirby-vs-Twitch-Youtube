@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CurlDotNet" Version="9.5.2" />
     <PackageReference Include="Dolphin.Memory.Access" Version="1.0.3" />
   </ItemGroup>
 
