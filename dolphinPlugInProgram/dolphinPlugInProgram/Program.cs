@@ -12,6 +12,14 @@ using System.Text.Json;
 
 namespace dolphinPlugInProgram //uwu
 {
+
+    public interface IWebhook
+    {
+        long Id { get; }
+        string Url { get; }
+        JsonDocument Body { get; }
+    }
+
     internal class Program
     {
 
@@ -100,7 +108,16 @@ namespace dolphinPlugInProgram //uwu
             }
             else {
                 Console.WriteLine(":(");
+                return;
             }
+        }
+
+        public static HttpRequestMessage ToHttpRequestMessage(this IWebhook webhook)
+        {
+            return new HttpRequestMessage(HttpMethod.Post, webhook.Url)
+            {
+                Content = new StringContent(webhook.Body.RootElement.GetRawText(), Encoding.UTF8, "application/json")
+            };
         }
 
     }
