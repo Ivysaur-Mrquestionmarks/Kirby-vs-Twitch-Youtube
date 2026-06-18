@@ -13,12 +13,7 @@ using System.Text.Json;
 namespace dolphinPlugInProgram //uwu
 {
 
-    public interface IWebhook
-    {
-        long Id { get; }
-        string Url { get; }
-        JsonDocument Body { get; }
-    }
+
 
     internal class Program
     {
@@ -89,6 +84,9 @@ namespace dolphinPlugInProgram //uwu
 
             System.Threading.Thread.Sleep(50000);
         }
+
+
+
         async void createToken() {
 
             var result = await Curl.ExecuteAsync(@"
@@ -107,18 +105,25 @@ namespace dolphinPlugInProgram //uwu
                 //Console.WriteLine($"Payment successful! ID: {charge.Id}");
             }
             else {
-                Console.WriteLine(":(");
+                Console.WriteLine("Couldn't get auth token :(");
+                return;
+            }
+
+            try
+            {
+                var chatMsg = new HttpRequestMessage(HttpMethod.Post, "https://api.twitch.tv/helix/eventsub/subscriptions")
+                {
+                    Content = new StringContent(webhook.Body.RootElement.GetRawText(), Encoding.UTF8, "application/json")
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
                 return;
             }
         }
 
-        public static HttpRequestMessage ToHttpRequestMessage(this IWebhook webhook)
-        {
-            return new HttpRequestMessage(HttpMethod.Post, webhook.Url)
-            {
-                Content = new StringContent(webhook.Body.RootElement.GetRawText(), Encoding.UTF8, "application/json")
-            };
-        }
+
 
     }
 
