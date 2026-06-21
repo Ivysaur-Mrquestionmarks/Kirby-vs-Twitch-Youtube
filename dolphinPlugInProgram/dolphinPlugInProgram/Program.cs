@@ -92,7 +92,7 @@ namespace dolphinPlugInProgram //uwu
             var result = await Curl.ExecuteAsync(@"
                 curl -X POST https://id.twitch.tv/oauth2/token \
                 -H 'Content-Type: application/x-www-form-urlencoded' \
-                -d 'client_id=1qr5we58yuoxy63j14didy20d4adb9&client_secret=me6n8cx9dg6gu0iitg1b6bqw5yrgyw&grant_type=client_credentials'
+                -d 'client_id=1qr5we58yuoxy63j14didy20d4adb9&client_secret=qjgnxyrkwtizc9vwjxu2z3bof946sp&grant_type=client_credentials'
             ");
 
             if (result.IsSuccess)
@@ -103,24 +103,28 @@ namespace dolphinPlugInProgram //uwu
                 Console.WriteLine(parts[3]);
                 //var charge = result.ParseJson<StripeCharge>();
                 //Console.WriteLine($"Payment successful! ID: {charge.Id}");
+                try
+                {
+                    string mesage = "curl -X POST 'https://api.twitch.tv/helix/eventsub/subscriptions' \\\r\n-H 'Authorization: Bearer " + parts[3] + "' \\\r\n-H 'Client-Id: 1qr5we58yuoxy63j14didy20d4adb9' \\\r\n-H 'Content-Type: application/json' \\\r\n-d '{\r\n  \"type\": \"channel.chat.message\",\r\n  \"version\": \"1\",\r\n  \"condition\": {\r\n    \"broadcaster_user_id\": \"12826\",\r\n    \"user_id\": \"141981764\"\r\n  },\r\n  \"transport\": {\r\n    \"method\": \"webhook\",\r\n    \"callback\": \"https://your-callback-url-here.example\",\r\n    \"secret\": \"qjgnxyrkwtizc9vwjxu2z3bof946sp\"\r\n  }\r\n}'";
+                    var chatMsg = new HttpRequestMessage(HttpMethod.Post, "https://api.twitch.tv/helix/eventsub/subscriptions")
+                    {
+                        Content = new StringContent(mesage, Encoding.UTF8, "application/json")
+                    };
+                    Console.WriteLine(chatMsg);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    return;
+                }
             }
             else {
                 Console.WriteLine("Couldn't get auth token :(");
                 return;
             }
 
-            try
-            {
-                var chatMsg = new HttpRequestMessage(HttpMethod.Post, "https://api.twitch.tv/helix/eventsub/subscriptions")
-                {
-                    Content = new StringContent(webhook.Body.RootElement.GetRawText(), Encoding.UTF8, "application/json")
-                };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return;
-            }
+
+
         }
 
 
