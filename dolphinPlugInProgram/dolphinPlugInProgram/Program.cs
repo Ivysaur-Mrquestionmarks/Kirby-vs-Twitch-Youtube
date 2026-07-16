@@ -1,6 +1,7 @@
 ﻿using CurlDotNet;
 using CurlDotNet.Core;
 using Dolphin.Memory.Access;
+using Ninject.Activation;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
@@ -103,14 +104,17 @@ namespace dolphinPlugInProgram //uwu
                 Console.WriteLine(parts[3]);
                 //var charge = result.ParseJson<StripeCharge>();
                 //Console.WriteLine($"Payment successful! ID: {charge.Id}");
+                HttpClient client = new HttpClient();
                 try
                 {
+                    
                     string mesage = "curl -X POST 'https://api.twitch.tv/helix/eventsub/subscriptions' \\\r\n-H 'Authorization: Bearer " + parts[3] + "' \\\r\n-H 'Client-Id: 1qr5we58yuoxy63j14didy20d4adb9' \\\r\n-H 'Content-Type: application/json' \\\r\n-d '{\r\n  \"type\": \"channel.chat.message\",\r\n  \"version\": \"1\",\r\n  \"condition\": {\r\n    \"broadcaster_user_id\": \"12826\",\r\n    \"user_id\": \"141981764\"\r\n  },\r\n  \"transport\": {\r\n    \"method\": \"webhook\",\r\n    \"callback\": \"https://your-callback-url-here.example\",\r\n    \"secret\": \"qjgnxyrkwtizc9vwjxu2z3bof946sp\"\r\n  }\r\n}'";
                     var chatMsg = new HttpRequestMessage(HttpMethod.Post, "https://api.twitch.tv/helix/eventsub/subscriptions")
                     {
                         Content = new StringContent(mesage, Encoding.UTF8, "application/json")
                     };
-                    Console.WriteLine(chatMsg);
+                    var response = await client.SendAsync(chatMsg);
+                    Console.WriteLine(response);
                 }
                 catch (Exception ex)
                 {
